@@ -1,18 +1,19 @@
-var express = require('express');
-var app= express();
+const express = require('express');
+const port = 3002;
 
-app.get('/',function(req,res){
-    res.send('Una API basica desdes express');
-});
+const bodyParser = require('body-parser');
+const routes = require ('./routes/routes');
+const app = express();
 
-app.get('/saludo',function(req,res){
-    res.send('Hola desde la API');
-});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true,
+}));
 
-app.get('/despedida',function(req,res){
-    res.send('Adios desdes una API');
-});
+routes(app);
 
-app.listen(3000,function(){
-    console.log('Aplicacion ejemplo,escuchamos el puerto 3000 !');
+const server = app.listen(port,(error) => {
+    if(error) return console.log(`Error : ${error}`);
+
+    console.log(`El servidor escucha en el puesto  ${server.address().port}`);
 });
