@@ -1,12 +1,24 @@
-const mysql = require('mysql');
+const mssql = require('mssql');
 
 const config = {
-    host : 'localhost',
-    user: 'root',
-    password:   'root',
-    database: 'api'
-}
+    user: 'normal',
+    password: 'Normal',
+    database: 'api',
+    server: 'localhost',
+    options: {
+        encrypt: true,
+        trustServerCertificate: true
+    }
+};
 
-const pool = mysql.createPool(config);
+
+const pool = new mssql.ConnectionPool(config)
+    .connect()
+    .then(pool => {
+        console.log('Conectado a la base de datos');
+        return pool;
+    }).catch(err => {
+        console.log('Error en la conexion a base de datos ' + err);
+    });
 
 module.exports = pool;
