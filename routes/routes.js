@@ -61,7 +61,60 @@ app.delete('/users/:id', async (request, response) => {
     });
 });
 
+app.get('/productos', async (request, response) => {
+  const db = await pool;
+  const result = await db.request().query('SELECT * FROM productos', (error, result) => {
+    if (error) throw error;
+    response.send(result.recordset);
+  });
+});
 
+app.get('/productos/:id', async (request, response) => {
+  const db = await pool;
+  const id = request.params.id;
+  const result = await db.request().query(`SELECT * FROM productos WHERE id = ${id}`, (error, result) => {
+    if (error) throw error;
+    response.send(result.recordset);
+  });
+});
+
+app.post('/productos', async (req, res) => {
+  const { id, nombre, descripcion } = req.body;
+  try {
+    const db = await pool;
+    const result = await db.request()
+      .input('id', id)
+      .input('nombre', nombre)
+      .input('descripcion', descripcion)
+      .query('INSERT INTO productos (id, nombre, descripcion) VALUES (@id, @nombre, @descripcion)');
+    res.send(result.rowsAffected);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error inserting product');
+  }
+});
+
+app.put('/productos/:id', async (request, response) => {
+  const db = await pool;
+  const { id } = request.params;
+  const { nombre, descripcion } = request.body;
+
+  const result = await db.request()
+    .input('nombre', nombre)
+    .input('descripcion', descripcion)
+    .input('id', id)
+    .query('UPDATE productos SET nombre = @nombre, descripcion = @descripcion WHERE id = @id');
+  response.send(result);
+});
+
+app.delete('/productos/:id', async (request, response) => {
+  const db = await pool;
+  const id = request.params.id;
+  const result = await db.request().query(`DELETE FROM productos WHERE id = ${id}`, (error, result) => {
+    if (error) throw error;
+    response.send(result.recordset);
+  });
+});
 };
 
 module.exports = router;
